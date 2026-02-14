@@ -12,6 +12,7 @@ import { OrderRouter } from "./module/order/orders.route";
 import { addressRouter } from "./module/Address/address.route";
 import { cartItemRouter } from "./module/cartItem/cartItem.route";
 import { ReviewRouter } from "./module/reviews/reviews.route";
+import { manufacturerRouter } from "./module/manufacturer/manufacturer.route";
 
 const app = express();
 
@@ -43,18 +44,27 @@ app.get("/", async (req: Request, res: Response) => {
 });
 
 
+// app.use("/api/categories", categoriesRouter);
+// app.use("/api/medicines", medicineRouter);
+// app.use("/api", userRouter);
+// app.use("/api/cart", cartItemRouter);
+// app.use("/api/orders", OrderRouter);
+// app.use("/api/address", addressRouter);
+// app.use("/api/reviews", ReviewRouter);
+// app.use("/api/seller", sellerRouter);
+
+
+
 app.use("/api/categories", categoriesRouter);
 app.use("/api/medicines", medicineRouter);
-
+app.use("/api/products", medicineRouter);
+app.use("/api/manufacturers", manufacturerRouter);
 
 app.use("/api", userRouter);
-
 app.use("/api/cart", cartItemRouter);
 app.use("/api/orders", OrderRouter);
 app.use("/api/address", addressRouter);
 app.use("/api/reviews", ReviewRouter);
-
-
 app.use("/api/seller", sellerRouter);
 
 
@@ -91,3 +101,4 @@ app.use((err: any, req: Request, res: Response, next: NextFunction) => {
 });
 
 export default app;
+

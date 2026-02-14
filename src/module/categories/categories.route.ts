@@ -15,18 +15,20 @@ router.post(
 // Public: Get all categories
 router.get("/", CategoriesController.getAllCategory);
 
-// Admin: Update category
+// Admin/Seller: Update category
 router.patch(
   "/:id",
-  authGuard(ROLE.ADMIN),
+  authGuard(ROLE.ADMIN, ROLE.SELLER),
   CategoriesController.updateCategory,
 );
 
-// Admin: Delete category
+// Admin/seller: Delete category
 router.delete(
   "/:id",
-  authGuard(ROLE.ADMIN),
+  authGuard(ROLE.ADMIN, ROLE.SELLER),
   CategoriesController.deleteCategory,
 );
+
+router.get("/:id", CategoriesController.getSingleCategory);
 
 export const categoriesRouter = router;
