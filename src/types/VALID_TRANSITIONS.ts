@@ -1,6 +1,9 @@
+// =======================
+// Valid Order Status Transitions
 
 import { ORDER_STATUS } from "../generated/prisma/enums";
 
+// =======================
 const VALID_TRANSITIONS: Record<ORDER_STATUS, ORDER_STATUS[]> = {
   [ORDER_STATUS.PLACED]: [ORDER_STATUS.CONFIRMED, ORDER_STATUS.CANCELLED],
   [ORDER_STATUS.PENDING]: [ORDER_STATUS.CONFIRMED, ORDER_STATUS.CANCELLED],

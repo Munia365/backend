@@ -2,6 +2,6 @@ export interface CreateReviewPayload {
   userId: string;
   medicineId: string;
   orderId: string;
-  rating: number; 
+  rating: number; // 1-5
   comment?: string;
 }

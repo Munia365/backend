@@ -4,6 +4,7 @@ import cors from "cors";
 import { toNodeHandler } from "better-auth/node";
 import { env } from "./config/env";
 import { auth } from "./lib/auth";
+
 import { userRouter } from "./module/auth/auth.route";
 import { medicineRouter } from "./module/medicine/medicine.route";
 import { categoriesRouter } from "./module/categories/categories.route";
@@ -16,45 +17,43 @@ import { manufacturerRouter } from "./module/manufacturer/manufacturer.route";
 
 const app = express();
 
-app.use(
-  cors({
-    origin: env.FRONT_END_URL,
-    methods: ["GET", "POST", "PUT", "DELETE", "PATCH"],
-    credentials: true,
-  }),
-);
+app.set("trust proxy", 1);
 
+const allowedOrigins = [
+  env.FRONT_END_URL?.replace(/\/$/, ""),
+  "https://medi-store-front-end.vercel.app",
+  "http://localhost:3000",
+].filter(Boolean) as string[];
+
+const corsMiddleware = cors({
+  origin: (origin, cb) => {
+    if (!origin) return cb(null, true);
+    const cleaned = origin.replace(/\/$/, "");
+    if (allowedOrigins.includes(cleaned)) return cb(null, true);
+    return cb(new Error(`CORS blocked origin: ${origin}`));
+  },
+  credentials: true,
+  methods: ["GET", "POST", "PUT", "DELETE", "PATCH", "OPTIONS"],
+  allowedHeaders: ["Content-Type", "Authorization"],
+});
+
+app.use(corsMiddleware);
+
+app.options(/.*/, corsMiddleware);
 
 app.use(express.json());
 app.use(express.urlencoded({ extended: true }));
 
+app.all(/^\/api\/auth\/.*/, toNodeHandler(auth));
 
-app.all("/api/auth/*splat", toNodeHandler(auth));
-
-
-app.get("/", async (req: Request, res: Response) => {
+app.get("/", (_req: Request, res: Response) => {
   return res.status(200).json({
     success: true,
     message: "MediStore API is running",
-    timestamp: new Date().toLocaleString("en-BD", {
-      timeZone: "Asia/Dhaka",
-      hour12: false,
-    }),
   });
 });
 
-
-// app.use("/api/categories", categoriesRouter);
-// app.use("/api/medicines", medicineRouter);
-// app.use("/api", userRouter);
-// app.use("/api/cart", cartItemRouter);
-// app.use("/api/orders", OrderRouter);
-// app.use("/api/address", addressRouter);
-// app.use("/api/reviews", ReviewRouter);
-// app.use("/api/seller", sellerRouter);
-
-
-
+// Routes
 app.use("/api/categories", categoriesRouter);
 app.use("/api/medicines", medicineRouter);
 app.use("/api/products", medicineRouter);
@@ -67,38 +66,20 @@ app.use("/api/address", addressRouter);
 app.use("/api/reviews", ReviewRouter);
 app.use("/api/seller", sellerRouter);
 
-
-app.use((req: Request, res: Response, next: NextFunction) => {
-  const localTime = new Date().toLocaleString("en-BD", {
-    timeZone: "Asia/Dhaka",
-    hour12: false,
-  });
-
-  return res.status(404).json({
+app.use((req: Request, res: Response) => {
+  res.status(404).json({
     success: false,
     message: "Route not found",
     path: req.path,
-    method: req.method,
-    timestamp: localTime,
-    suggestion: "Please check the URL or API documentation",
   });
 });
 
-
-app.use((err: any, req: Request, res: Response, next: NextFunction) => {
-  const status = err.statusCode || 500;
-  const timestamp = new Date().toLocaleString("en-BD", {
-    timeZone: "Asia/Dhaka",
-    hour12: false,
-  });
-
-  return res.status(status).json({
+app.use((err: any, _req: Request, res: Response, _next: NextFunction) => {
+  res.status(err.statusCode || 500).json({
     success: false,
     message: err.message || "Internal Server Error",
-    timestamp,
     ...(env.NODE_ENV === "development" && { stack: err.stack }),
   });
 });
 
 export default app;
-

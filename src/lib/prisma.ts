@@ -2,6 +2,9 @@ import "dotenv/config";
 import { PrismaPg } from "@prisma/adapter-pg";
 import { PrismaClient } from "../generated/prisma/client";
 
+// =============================
+// Environment Variable Validation
+// =============================
 const requiredEnvVars = ["DATABASE_URL", "BETTER_AUTH_URL"] as const;
 
 const optionalEnvVars = [
@@ -11,6 +14,7 @@ const optionalEnvVars = [
   "APP_PASS",
 ] as const;
 
+// Check required variables
 for (const envVar of requiredEnvVars) {
   if (!process.env[envVar]) {
     throw new Error(
@@ -20,6 +24,7 @@ for (const envVar of requiredEnvVars) {
   }
 }
 
+// Warn about optional variables
 for (const envVar of optionalEnvVars) {
   if (!process.env[envVar]) {
     console.warn(
@@ -28,7 +33,9 @@ for (const envVar of optionalEnvVars) {
   }
 }
 
-
+// =============================
+// Validate DATABASE_URL format
+// =============================
 const connectionString = process.env.DATABASE_URL!;
 
 if (
@@ -41,7 +48,9 @@ if (
   );
 }
 
-
+// =============================
+// Create Prisma Client with Adapter
+// =============================
 const adapter = new PrismaPg({ connectionString });
 
 const prisma = new PrismaClient({
@@ -52,7 +61,9 @@ const prisma = new PrismaClient({
       : ["error"],
 });
 
-
+// =============================
+// Test Database Connection
+// =============================
 prisma
   .$connect()
   .then(() => {
@@ -63,6 +74,9 @@ prisma
     process.exit(1);
   });
 
+// =============================
+// Graceful Shutdown
+// =============================
 process.on("beforeExit", async () => {
   console.log("🔌 Disconnecting from database...");
   await prisma.$disconnect();

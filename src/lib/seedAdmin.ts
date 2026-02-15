@@ -22,7 +22,7 @@ const seedAdmin = async () => {
     });
 
     if (!existingAdmin) {
-    
+      // Create new admin
       await auth.api.signUpEmail({
         body: {
           name: adminData.name,
@@ -33,7 +33,7 @@ const seedAdmin = async () => {
       console.log(" Admin user created");
     }
 
-   
+    //  Update  necessary fields
     await prisma.user.update({
       where: { email: adminData.email },
       data: {

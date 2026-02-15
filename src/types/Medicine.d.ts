@@ -1,11 +1,13 @@
-
+// ==============================
+// Controller Types
+// ==============================
 export interface CreateMedicineInput {
   name: string;
   description: string;
   manufacturer: string;
   price: number;
   categoryId: string;
-  userId: string; // seller ID
+  userId: string;
   discountPrice?: number;
   dosageForm?: string;
   strength?: string;
@@ -13,17 +15,25 @@ export interface CreateMedicineInput {
   images?: string[];
 }
 
-export interface GetMedicineInput {
+export type GetMedicineInput = {
   id?: string;
   slug?: string;
   categoryId?: string;
   sellerId?: string;
+  isActive?: boolean;
+
   page?: number;
   limit?: number;
+
   search?: string;
+
+  manufacturer?: string;
+  minPrice?: number;
+  maxPrice?: number;
+
   sortBy?: string;
   sortOrder?: "asc" | "desc";
-}
+};
 
 export interface UpdateMedicinePayload {
   name?: string;
@@ -38,9 +48,12 @@ export interface UpdateMedicinePayload {
   images?: string[];
   isActive?: boolean;
   isFeatured?: boolean;
+  stock?: number;
 }
 
-
+// ==============================
+// Service Types
+// ==============================
 export interface CreateMedicinePayload {
   name: string;
   description: string;
@@ -56,7 +69,7 @@ export interface CreateMedicinePayload {
 
 export interface UpdateMedicineInput {
   medicineId: string;
-  sellerId: string; 
+  sellerId: string;
   name?: string;
   description?: string;
   manufacturer?: string;
@@ -69,4 +82,16 @@ export interface UpdateMedicineInput {
   images?: string[];
   isActive?: boolean;
   isFeatured?: boolean;
+  stock?: number;
 }
+
+//  Stock endpoint types
+export type UpdateStockPayload = {
+  stock: number;
+};
+
+export type UpdateStockInput = {
+  medicineId: string;
+  sellerId: string;
+  stock: number;
+};
